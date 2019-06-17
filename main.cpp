@@ -3,6 +3,8 @@
 #include <fstream>
 #include <vector>
 #include <cctype>
+#include <algorithm>
+#include <cstring>
 
 #include "levenshtein.h"
 
@@ -14,7 +16,7 @@ char to_lowercase(char c){
 }
 
 char especiais(char c){
-    if (c==',' || c=='.')
+    if (c==',' || c=='.' || c=='(' || c==')')
     {
         c = '\0';
         return c;
@@ -22,12 +24,18 @@ char especiais(char c){
     
 }
 
+int dist(std::string palavra){
+
+}
+
 int main(){
+    int distancia = 0;
     std::string palavra;
     std::vector<std::string> palavras_dicionario;
     std::vector<std::string> palavras_imd;
     std::vector<std::string>::iterator encontrado;
     std::vector<std::string> palavras_erradas;
+    std::vector<std::string> palavras_corretas;
 
     std::ifstream arquivo_dicionario;
     std::ifstream arquivo_texto;
@@ -73,9 +81,24 @@ int main(){
 
     for (int i = 0; i < palavras_erradas.size(); i++)
     {
-        std::cout << palavras_erradas.back() << std::endl;
+        for (int i = 0; i < palavras_dicionario.size(); i++)
+        {
+            if (levenshtein(palavras_erradas.back(), palavras_dicionario.back()) <= palavras_erradas.back().length())
+            {
+                palavras_corretas.push_back(palavras_dicionario.back());
+            }
+            palavras_dicionario.pop_back();
+        }
         palavras_erradas.pop_back();
     }
+
+    for (int i = 0; i < palavras_corretas.size(); i++)
+    {
+        std::cout << palavras_corretas.back() << std::endl;
+        palavras_corretas.pop_back();
+    }
+    
+    
     
 
     arquivo_dicionario.close();
