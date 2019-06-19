@@ -6,6 +6,7 @@
 #include <algorithm>
 #include <cstring>
 #include <map>
+#include <list>
 
 
 #include "levenshtein.h"
@@ -26,23 +27,12 @@ char especiais(char c){
     
 }
 
-int dist(std::string palavra){
-
-}
-
 int main(){
-    int distancia = 0;
-    
     std::string palavra;
     std::map<std::string, int> palavras_dicionario;
-    std::vector<std::string> palavras_texto;
-    //std::map<int, std::string>::iterator encontrado;
-    //std::vector<std::string> palavras_dicionario;
-    //std::vector<std::string> palavras_imd;
-    //std::vector<std::string>::iterator encontrado;
-    //std::vector<std::string> palavras_erradas;
-    //std::vector<std::string> palavras_corretas;
-
+    std::map<std::string, int> palavras_texto;
+    std::list<std::string> palavras_corretas;
+    
     std::ifstream arquivo_dicionario;
     std::ifstream arquivo_texto;
 
@@ -70,25 +60,22 @@ int main(){
             }
             if (!palavras_dicionario[palavra])
             {
-                palavras_texto.push_back(palavra);
+                palavras_texto.insert(std::pair<std::string, int>(palavra, palavra.length()));
             }
         }
     }
 
     std::cout << "Quantidade de palavras erradas: " << palavras_texto.size() << std::endl;
 
-    for (int i = 0; i < palavras_texto.size(); i++)
+    for (auto& x: palavras_texto)
     {
-        std::cout << palavras_texto.at(i) << std::endl;
+        for (auto& z: palavras_dicionario)
+        {
+            if(levenshtein(x.first, z.first) == 1){
+                palavras_corretas.push_front(z.first);
+            }
+        }
     }
-
-    for (int i = 0; i < palavras_texto.size(); i++)
-    {
-        
-    }
-    
-    
-    
     
 
     arquivo_dicionario.close();
