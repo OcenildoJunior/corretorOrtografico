@@ -19,7 +19,7 @@ char to_lowercase(char c){
 }
 
 char especiais(char c){
-    if (c==',' || c=='.' || c=='(' || c==')')
+    if (c==',' || c=='.' || c=='(' || c==')' || c=='-' || c=='*' || c=='_' || c=='!' || c==';')
     {
         c = '\0';
         return c;
@@ -28,10 +28,11 @@ char especiais(char c){
 }
 
 int main(){
+    int cont = 0;
     std::string palavra;
     std::map<std::string, int> palavras_dicionario;
     std::map<std::string, int> palavras_texto;
-    std::list<std::string> palavras_corretas;
+    std::vector<std::string> palavras_corretas;
     
     std::ifstream arquivo_dicionario;
     std::ifstream arquivo_texto;
@@ -53,7 +54,7 @@ int main(){
         while (!arquivo_texto.eof())
         {
             arquivo_texto >> palavra;
-            for (char &c: palavra)
+            for (char& c: palavra)
             {
                 c = to_lowercase(c);
                 c = especiais(c);
@@ -67,13 +68,64 @@ int main(){
 
     std::cout << "Quantidade de palavras erradas: " << palavras_texto.size() << std::endl;
 
-    for (auto& x: palavras_texto)
-    {
+    for(auto& x: palavras_texto){
+        bool encontrado;
+        int qtde_palavras = 0;
         for (auto& z: palavras_dicionario)
         {
-            if(levenshtein(x.first, z.first) == 1){
-                palavras_corretas.push_front(z.first);
+            if (levenshtein(x.first, z.first) == 1 && qtde_palavras<=5)
+            {
+                palavras_corretas.push_back(z.first);
+                encontrado=true;
+                qtde_palavras++;
             }
+        }
+        if(!encontrado && qtde_palavras<=5){
+            for (auto& z: palavras_dicionario)
+            {
+                if (levenshtein(x.first, z.first)==2)
+                {
+                    if (!encontrado)
+                    {
+                        palavras_corretas.push_back(z.first);
+                        encontrado=true;
+                        qtde_palavras++;
+                    }
+                }
+            }
+            if(!encontrado && qtde_palavras<=5){
+                for (auto& z: palavras_dicionario)
+                {
+                    if (levenshtein(x.first, z.first)==3)
+                    {
+                        palavras_corretas.push_back(z.first);
+                        encontrado=true;
+                        qtde_palavras++;
+                    }
+                }
+            }
+            if(!encontrado && qtde_palavras<=5){
+                for (auto& z: palavras_dicionario)
+                {
+                    if (levenshtein(x.first, z.first)>=4)
+                    {
+                        palavras_corretas.push_back(z.first);
+                        encontrado=true;
+                        qtde_palavras++;
+                    }
+                }
+            }
+        }
+        int tmp=palavras_corretas.size();
+        if (tmp>0)
+        {
+            std::cout << "Palavra errada: " << x.first << std::endl;
+            std::cout << "Correções: " << std::endl;
+            for(int i = 0; i < tmp; i++){
+                std::cout << palavras_corretas.back() << std::endl;
+                palavras_corretas.pop_back();
+            }
+            std::cout << std::endl;   
         }
     }
     
